@@ -21,6 +21,8 @@ def sidra_get(url: str = None,
     sidra_get() baixa tabelas do SIDRA.
     
     tabela: pode ser uma string ou uma lista de strings com os códigos das tabelas, contanto que elas possuam todos os demais parâmetros em comum.
+    
+    return DataFrame
     """
 
     if tabela:
