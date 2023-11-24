@@ -75,6 +75,8 @@ def sidra_get(url: str = None,
 
         if resposta.status_code == 200:
             sidra_df = pd.DataFrame(resposta.json())
+            sidra_df.columns = sidra_df.iloc[0]
+            sidra_df = sidra_df[1:]
         else:
             raise ValueError(f'Erro na consulta {url}: {resposta.text}.')
 
@@ -91,7 +93,8 @@ def sidra_get(url: str = None,
             consulta = f'values/t/{t}/'
             consulta += f'{'/'.join(lista_niveis_geograficos)}/'
             consulta += f'v/{'/'.join(lista_variaveis)}/'
-            consulta += '/'.join([f'c{key}/{','.join(value)}' for key, value in classificacao.items()])
+            if classificacao:
+                consulta += '/'.join([f'c{key}/{','.join(value)}' for key, value in classificacao.items()])
             consulta += '/p/all'
             
             url = endpoint + consulta
@@ -101,7 +104,10 @@ def sidra_get(url: str = None,
                 resposta = s.get(url)
             
             if resposta.status_code == 200:
-                lista_dfs.append(pd.DataFrame(resposta.json()))
+                nova_tabela = pd.DataFrame(resposta.json())
+                nova_tabela.columns = nova_tabela.iloc[0]
+                nova_tabela = nova_tabela[1:]
+                lista_dfs.append(nova_tabela)
             else:
                 raise ValueError(f'Erro na tabela {t}: {resposta.text}.')
         
@@ -110,6 +116,4 @@ def sidra_get(url: str = None,
     else:
         raise ValueError('sidra_get() requer pelo menos uma url ou uma tabela.')
     
-    sidra_df.columns = sidra_df.iloc[0]
-    sidra_df = sidra_df[1:]
     return sidra_df
